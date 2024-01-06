@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Bioskop1</string>
+    <string name="title_activity_login">LoginActivity</string>
+</resources>

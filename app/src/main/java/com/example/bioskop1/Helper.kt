@@ -15,6 +15,7 @@ object Helper {
     var total: Double = 0.0
 
     val BASE_URL = "http://26.235.165.119/bioskop_api/public/api"
+    val DATE_PATTERN = "EEEE, dd MMM yyyy"
 
     fun message(message: String, activity: Activity, action: Boolean = false){
         val alertDialog = AlertDialog.Builder(activity)

@@ -9,7 +9,6 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
-import androidx.annotation.experimental.Experimental
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -68,7 +67,6 @@ import com.example.bioskop1.model.Schedulee
 import com.example.bioskop1.model.Seat
 import com.example.bioskop1.model.SeatModel
 import com.example.bioskop1.ui.theme.Bioskop1Theme
-import getSerializable
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -102,7 +100,7 @@ class TicketOrderActivity : ComponentActivity(){
         val movie = remember { getSerializable(this, "movie", Movie::class.java)}
         var movieModel by remember { mutableStateOf<MovieModel?>(null) }
         val viewModel = remember { TicketOrderViewModel()}
-        var seatModel by remember { mutableStateOf<SeatModel>(null) }
+        var seatModel by remember { mutableStateOf<SeatModel?>(null) }
 
         LaunchedEffect(movie){
             movieModel = showMovie(movie.id)
@@ -365,8 +363,8 @@ private fun TicketOrderContent(movieModel: MovieModel, seatModel: SeatModel?, vi
                         comboBoxValue = "${it.start_time} - ${it.end_time}"
                         viewModel.selectedSeats = setOf()
                     },
-                    isDropdownExpanded = isDropdownExpanded,
-                    onToogleDropdown = {isDropdownExpanded = !isDropdownExpanded}
+                    isDropDownExpanded = isDropdownExpanded,
+                    onToogleDropDown = {isDropdownExpanded = !isDropdownExpanded}
                 )
 
                 Column(
@@ -420,7 +418,7 @@ private fun TicketOrderContent(movieModel: MovieModel, seatModel: SeatModel?, vi
                                     text = "${s + 1}",
                                     seat = seat,
                                     selectedSeats = viewModel.selectedSeats,
-                                    onSeatSeleected = { selectedSeat ->
+                                    onSeatSelected = { selectedSeat ->
                                         viewModel.selectedSeats = if (viewModel.selectedSeats.contains(selectedSeat)) {
                                             viewModel.selectedSeats - selectedSeat
                                         } else {
@@ -503,7 +501,7 @@ private fun CustomTopBar(){
 @Composable
 fun ComboBox(
     label: String,
-    selecteValue: String,
+    selectedValue: String,
     values: List<Schedulee>,
     onValueChange: (Schedulee) -> Unit,
     isDropDownExpanded: Boolean,
@@ -529,7 +527,7 @@ fun ComboBox(
                     .padding(16.dp)
             ){
                 BasicTextField(
-                    value = selecteValue,
+                    value = selectedValue,
                     onValueChange = {},
                     keyboardOptions = KeyboardOptions.Default.copy(
                         imeAction = ImeAction.Done,
@@ -598,6 +596,8 @@ fun MyDatePickerDialog(viewModel: TicketOrderViewModel){
     }
 }
 
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyDatePickerDialog(
@@ -636,6 +636,41 @@ fun MyDatePickerDialog(
         DatePicker(
             state = datePickerState
         )
+    }
+}
+
+@Composable
+fun SeatButton(
+    text: String,
+    seat: Seat,
+    selectedSeats: Set<Seat>,
+    onSeatSelected: (Seat) -> Unit
+){
+    val buttonColor = when(seat.status){
+        "Booked" -> Color.Yellow
+        "Ordered" -> Color.Green
+        "Available" -> {
+            if (selectedSeats.contains(seat)) Color.Black
+            else MaterialTheme.colorScheme.primary
+        }
+        else -> Color.Gray
+    }
+
+    Button(
+        onClick = {
+            if (seat.status == "Available"){
+                onSeatSelected(seat)
+            }
+        },
+        modifier = Modifier
+            .padding(4.dp)
+            .fillMaxWidth(),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = buttonColor,
+            contentColor =  if (seat.status == "Available") Color.White else Color.Black
+        )
+    ) {
+        Text(text = text)
     }
 }
 

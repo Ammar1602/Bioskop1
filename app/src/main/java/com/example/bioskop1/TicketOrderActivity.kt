@@ -10,6 +10,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,9 +25,15 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -40,6 +48,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
@@ -480,6 +490,94 @@ private fun CustomTopBar(){
                 .fillMaxWidth(),
             textAlign = TextAlign.Center
         )
+    }
+}
+
+@Composable
+fun ComboBox(
+    label: String,
+    selecteValue: String,
+    values: List<Schedulee>,
+    onValueChange: (Schedulee) -> Unit,
+    isDropDownExpanded: Boolean,
+    onToogleDropDown: () -> Unit
+){
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+    ){
+        Column {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(top = 8.dp)
+            )
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.White)
+                    .border(1.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(4.dp))
+                    .clickable { onToogleDropDown }
+                    .padding(16.dp)
+            ){
+                BasicTextField(
+                    value = selecteValue,
+                    onValueChange = {},
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        imeAction = ImeAction.Done,
+                        keyboardType = KeyboardType.Text
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            onToogleDropDown()
+                        }
+                    ),
+                    textStyle = LocalTextStyle.current.copy(color = Color.Black),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { onToogleDropDown() }
+                        .padding(16.dp)
+                )
+                if (isDropDownExpanded){
+                    DropdownMenu(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color.White)
+                            .border(
+                                1.dp,
+                                MaterialTheme.colorScheme.primary,
+                                RoundedCornerShape(4.dp)
+                            ),
+                        expanded = true,
+                        onDismissRequest = { onToogleDropDown() }
+                    ) {
+                        values.forEach {value ->
+                            DropdownMenuItem(
+                                text = { Text(text = "${value.start_time} - ${value.end_time}", color = Color.Black) },
+                                onClick = {
+                                    onValueChange(value)
+                                    onToogleDropDown()
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun MyDatePickerDialog(viewModel: TicketOrderViewModel){
+    var showDatePicker by remember {
+        mutableStateOf(false)
+    }
+
+    Box(contentAlignment = Alignment.Center){
+        Button(onClick = {showDatePicker = true}) {
+            Text(text = viewModel.selectedDate)
+        }
     }
 }
 

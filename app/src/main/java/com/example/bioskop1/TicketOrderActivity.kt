@@ -9,6 +9,7 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
+import androidx.annotation.experimental.Experimental
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -31,11 +32,16 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -70,6 +76,7 @@ import retrofit2.awaitResponse
 import java.io.Serializable
 import java.lang.NumberFormatException
 import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 
 class TicketOrderActivity : ComponentActivity(){
@@ -579,6 +586,62 @@ fun MyDatePickerDialog(viewModel: TicketOrderViewModel){
             Text(text = viewModel.selectedDate)
         }
     }
+
+    if (showDatePicker){
+        MyDatePickerDialog(
+            onDateSelected = {
+                viewModel.selectedDate = it
+                viewModel.selectedSeats = setOf()
+            },
+            onDismiss = {showDatePicker = false}
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MyDatePickerDialog(
+    onDateSelected: (String) -> Unit,
+    onDismiss: () -> Unit
+){
+    val datePickerState = rememberDatePickerState(selectableDates = object : SelectableDates {
+        override fun  isSelectableDate(utcTimeMillis: Long):Boolean{
+            return utcTimeMillis >= System.currentTimeMillis()
+        }
+    })
+
+    val selectedDate = datePickerState.selectedDateMillis?.let {
+        convertMillistoDate(it)
+    } ?: ""
+    
+    DatePickerDialog(
+        onDismissRequest = { onDismiss()},
+        confirmButton = {
+            Button(onClick = {
+                onDateSelected(selectedDate)
+                onDismiss()
+            }
+            ) {
+                Text(text = "OK")
+            }
+        },
+        dismissButton = {
+            Button(onClick = {
+                onDismiss()
+            }) {
+                Text(text = "Cancel")
+            }
+        }
+    ) {
+        DatePicker(
+            state = datePickerState
+        )
+    }
+}
+
+private fun convertMillistoDate(millis: Long):String{
+    val formatter = SimpleDateFormat(Helper.DATE_PATTERN)
+    return formatter.format(Date(millis))
 }
 
 private fun <T : Serializable> getSerializable(activity: Activity, name: String, clazz: Class<T>): T

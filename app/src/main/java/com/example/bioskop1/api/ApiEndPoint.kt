@@ -7,6 +7,7 @@ import com.example.bioskop1.model.ResponseModel
 import com.example.bioskop1.model.Schedulee
 import com.example.bioskop1.model.Seat
 import com.example.bioskop1.model.SeatModel
+import com.example.bioskop1.model.TicketModel
 import com.example.bioskop1.model.UserModel
 import retrofit2.Call
 import retrofit2.http.Field
@@ -44,4 +45,7 @@ interface ApiEndPoint {
     fun createdOrderDetail(@Field("order_id") order: Int, @Field
         ("movie_schedule_id") schedulee: Int, @Field("seat_id") seat: Int, @Field
         ("movie_screening") date: String): Call<ResponseModel>
+
+    @GET("ticket")
+    fun getTicket(): Call<TicketModel>
 }

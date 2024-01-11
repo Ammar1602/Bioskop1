@@ -33,7 +33,6 @@ import coil.compose.AsyncImage
 import com.example.bioskop1.Helper
 import com.example.bioskop1.R
 import com.example.bioskop1.ui.theme.Bioskop1Theme
-import kotlinx.coroutines.channels.TickerMode
 import java.io.Serializable
 
 class MovieDetail : ComponentActivity() {

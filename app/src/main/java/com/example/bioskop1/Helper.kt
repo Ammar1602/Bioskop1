@@ -2,7 +2,6 @@ package com.example.bioskop1
 
 import android.app.Activity
 import android.app.AlertDialog
-import androidx.core.app.NotificationCompat.MessagingStyle.Message
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -30,7 +29,7 @@ object Helper {
         alertDialog.show()
     }
 
-fun currencyFormat(price: Double): String{
+fun currencyFormat(price: String): String{
     return NumberFormat.getCurrencyInstance(Locale("id", "ID"))
         .format(price)
 }
